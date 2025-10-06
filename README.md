@@ -176,12 +176,12 @@ Models are cached at:
 ## Citation
 
 ```bibtex
-@misc{rtmpose3d2024,
+@misc{RTMPose3D,
   title={RTMPose3D: Real-Time Multi-Person 3D Pose Estimation},
-  author={OpenMMLab},
-  year={2024},
+  author={Bahadir Arac},
+  year={2025},
   publisher={GitHub},
-  howpublished={\url{https://github.com/open-mmlab/mmpose}}
+  howpublished={\url{https://github.com/mutedeparture/rtmpose3d}}
 }
 ```
 
