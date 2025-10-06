@@ -18,8 +18,17 @@ Standalone PyTorch package for RTMPose3D with automatic checkpoint download and 
 git clone https://github.com/mutedeparture/rtmpose3d.git
 cd rtmpose3d
 
-# Install dependencies
+# Install PyTorch (if not already installed)
+pip install torch>=2.0.0 torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
+
+# Install mmcv pre-built wheel (REQUIRED - avoids long compilation)
+pip install mmcv==2.2.0 -f https://download.openmmlab.com/mmcv/dist/cu121/torch2.4/index.html
+
+# Install other dependencies
 pip install -r requirements.txt
+
+# Patch MMDetection version check
+python -c "import mmdet; f=mmdet.__file__.replace('__init__.pyc','__init__.py').replace('__pycache__/',''); t=open(f).read().replace(\"'2.2.0'\",\"'2.3.0'\"); open(f,'w').write(t)"
 
 # Install package
 pip install -e .

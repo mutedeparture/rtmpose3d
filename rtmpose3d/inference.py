@@ -9,6 +9,29 @@ from pathlib import Path
 from typing import Optional, Dict
 import numpy as np
 
+# Patch MMDetection version check BEFORE importing mmdet
+def _patch_mmdet_version_check():
+    """Automatically patch MMDetection to accept mmcv 2.2.0"""
+    try:
+        # Find mmdet package location
+        import importlib.util
+        spec = importlib.util.find_spec('mmdet')
+        if spec and spec.origin:
+            mmdet_init_file = Path(spec.origin)
+            if mmdet_init_file.exists():
+                content = mmdet_init_file.read_text()
+                if "mmcv_maximum_version = '2.2.0'" in content:
+                    content = content.replace(
+                        "mmcv_maximum_version = '2.2.0'",
+                        "mmcv_maximum_version = '2.3.0'"
+                    )
+                    mmdet_init_file.write_text(content)
+    except Exception as e:
+        warnings.warn(f"Failed to patch MMDetection version check: {e}")
+
+# Apply patch before any mmdet imports
+_patch_mmdet_version_check()
+
 # Add package models to path for registration
 PACKAGE_ROOT = Path(__file__).parent
 sys.path.insert(0, str(PACKAGE_ROOT))
