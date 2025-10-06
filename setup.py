@@ -11,9 +11,9 @@ setup(
     description='RTMPose3D: Real-Time Multi-Person 3D Pose Estimation - Simple PyTorch interface',
     long_description=long_description,
     long_description_content_type='text/markdown',
-    author='OpenMMLab',
+    author='Bahadir Arac',
     author_email='',
-    url='https://github.com/open-mmlab/mmpose',
+    url='https://github.com/mutedeparture/rtmpose3d',
     packages=find_packages(exclude=['examples', 'tests']),
     package_data={
         'rtmpose3d': [

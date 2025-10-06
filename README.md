@@ -4,16 +4,30 @@
 
 Standalone PyTorch package for RTMPose3D with automatic checkpoint download and caching.
 
+## Requirements
+
+- Python >= 3.8
+- PyTorch >= 2.0.0
+- CUDA-capable GPU (recommended)
+- 4GB+ VRAM
+
 ## Installation
 
 ```bash
-# From the rtmpose3d directory
-pip install -e .
+# Clone the repository
+git clone https://github.com/mutedeparture/rtmpose3d.git
+cd rtmpose3d
 
-# Or directly
-cd /path/to/rtmpose3d
-python setup.py install
+# Install dependencies
+pip install -r requirements.txt
+
+# Install package
+pip install -e .
 ```
+
+**Note:** The RTMPose3D model checkpoint needs to be provided locally. Download it from:
+- [RTMW3D-L checkpoint](https://download.openmmlab.com/mmpose/v1/projects/rtmw3d/) (if available)
+- Or use the checkpoint from `rtmpose3d_original/demo/` folder
 
 ## Quick Start
 
@@ -21,7 +35,7 @@ python setup.py install
 import cv2
 from rtmpose3d import RTMPose3DInference
 
-# Initialize (auto-downloads models on first use)
+# Initialize (auto-downloads detector checkpoint on first use)
 model = RTMPose3DInference(device='cuda:0')
 
 # Run inference
@@ -34,11 +48,27 @@ print(results['keypoints_3d'].shape)  # [N, 133, 3]
 
 ## Features
 
-✅ **Fully standalone** - All configs and modules bundled  
-✅ **Auto-download** - Models download automatically on first use  
-✅ **Simple API** - One class, one method call  
-✅ **High accuracy** - Uses original PyTorch weights  
-✅ **Flexible** - Supports custom configs and checkpoints
+- ✅ **Zero-config inference**: Just import and run
+- ✅ **Auto-download**: Detector checkpoint downloads automatically to `~/.cache/rtmpose3d/`
+- ✅ **Local checkpoints**: Supports local RTMPose3D checkpoint files
+- ✅ **Simple API**: Numpy array in → dict with 3D keypoints out
+- ✅ **Batch support**: Process multiple people in one image
+- ✅ **High accuracy**: Uses PyTorch models (not ONNX) for best results
+
+## Checkpoint Management
+
+The package handles two checkpoints:
+
+1. **Detector (RTMDet)**: Auto-downloads from OpenMMLab (~99MB) on first use
+2. **Pose (RTMW3D-L)**: Requires local file (see Installation notes)
+
+Cache location: `~/.cache/rtmpose3d/checkpoints/`
+
+To clear cache:
+```python
+from rtmpose3d import clear_cache
+clear_cache()
+```
 
 ## Output Format
 
