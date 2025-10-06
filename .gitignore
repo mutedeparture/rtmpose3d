@@ -181,6 +181,9 @@ datasets/
 !examples/*.jpg
 !examples/*.jpeg
 !examples/*.png
+!doc/*.jpg
+!doc/*.jpeg
+!doc/*.png
 
 # Logs
 logs/
