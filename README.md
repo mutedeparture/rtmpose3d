@@ -27,16 +27,11 @@ pip install mmcv==2.2.0 -f https://download.openmmlab.com/mmcv/dist/cu121/torch2
 # Install other dependencies
 pip install -r requirements.txt
 
-# Patch MMDetection version check
-python -c "import mmdet; f=mmdet.__file__.replace('__init__.pyc','__init__.py').replace('__pycache__/',''); t=open(f).read().replace(\"'2.2.0'\",\"'2.3.0'\"); open(f,'w').write(t)"
-
 # Install package
 pip install -e .
 ```
 
-**Note:** The RTMPose3D model checkpoint needs to be provided locally. Download it from:
-- [RTMW3D-L checkpoint](https://download.openmmlab.com/mmpose/v1/projects/rtmw3d/) (if available)
-- Or use the checkpoint from `rtmpose3d_original/demo/` folder
+**Note:** Model checkpoints (316MB total) will auto-download from GitHub Releases on first use and are cached to `~/.cache/rtmpose3d/checkpoints/`.
 
 ## Quick Start
 
@@ -66,10 +61,12 @@ print(results['keypoints_3d'].shape)  # [N, 133, 3]
 
 ## Checkpoint Management
 
-The package handles two checkpoints:
+The package handles two checkpoints (both auto-download from GitHub Releases):
 
-1. **Detector (RTMDet)**: Auto-downloads from OpenMMLab (~99MB) on first use
-2. **Pose (RTMW3D-L)**: Requires local file (see Installation notes)
+1. **Detector (RTMDet-M)**: Auto-downloads (~95MB) on first use
+2. **Pose (RTMW3D-L)**: Auto-downloads (~221MB) on first use
+
+**Total download: ~316MB** (one-time, then cached)
 
 Cache location: `~/.cache/rtmpose3d/checkpoints/`
 

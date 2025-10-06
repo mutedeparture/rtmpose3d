@@ -115,23 +115,30 @@ class RTMPose3DInference:
             detector_checkpoint = get_checkpoint_path(detector_checkpoint, cache_dir)
             
         if pose_checkpoint is None:
-            # Try to use local checkpoint from rtmpose3d_original if available
-            original_checkpoint = Path(__file__).parent.parent / 'rtmpose3d_original' / 'demo' / 'rtmw3d-l_cock14-0d4ad840_20240422.pth'
-            if original_checkpoint.exists():
-                print(f"📦 Using local checkpoint: {original_checkpoint}")
-                pose_checkpoint = str(original_checkpoint)
+            # Auto-download pose checkpoint from GitHub releases
+            pose_url = POSE_L_CHECKPOINT_URL if self.model_size == 'l' else None
+            if pose_url:
+                print("📥 Downloading pose checkpoint...")
+                pose_checkpoint = get_checkpoint_path(pose_url, cache_dir)
             else:
-                # Try cached version
-                cached_checkpoint = Path.home() / '.cache' / 'rtmpose3d' / 'checkpoints' / 'rtmw3d-l_cock14-0d4ad840_20240422.pth'
-                if cached_checkpoint.exists():
-                    print(f"✓ Using cached checkpoint: {cached_checkpoint}")
-                    pose_checkpoint = str(cached_checkpoint)
+                # Fallback: try local checkpoint from rtmpose3d_original if available
+                original_checkpoint = Path(__file__).parent.parent / 'rtmpose3d_original' / 'demo' / 'rtmw3d-l_cock14-0d4ad840_20240422.pth'
+                if original_checkpoint.exists():
+                    print(f"📦 Using local checkpoint: {original_checkpoint}")
+                    pose_checkpoint = str(original_checkpoint)
                 else:
-                    raise RuntimeError(
-                        f"RTMPose3D checkpoint not found. Please provide pose_checkpoint parameter.\n"
-                        f"Expected at: {original_checkpoint}\n"
-                        f"Or download manually to: {cached_checkpoint}"
-                    )
+                    # Try cached version
+                    cached_checkpoint = Path.home() / '.cache' / 'rtmpose3d' / 'checkpoints' / 'rtmw3d-l_cock14-0d4ad840_20240422.pth'
+                    if cached_checkpoint.exists():
+                        print(f"✓ Using cached checkpoint: {cached_checkpoint}")
+                        pose_checkpoint = str(cached_checkpoint)
+                    else:
+                        raise RuntimeError(
+                            f"RTMPose3D checkpoint not found and no download URL available.\n"
+                            f"Please provide pose_checkpoint parameter or download manually:\n"
+                            f"  Expected at: {cached_checkpoint}\n"
+                            f"  Or from: https://github.com/mutedeparture/rtmpose3d/releases"
+                        )
         elif pose_checkpoint.startswith('http'):
             pose_checkpoint = get_checkpoint_path(pose_checkpoint, cache_dir)
         
