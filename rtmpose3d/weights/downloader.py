@@ -3,11 +3,15 @@ Automatic checkpoint downloader for RTMPose3D models
 """
 
 import os
+import logging
 from pathlib import Path
 from typing import Optional
 import hashlib
 from urllib.request import urlretrieve
 from tqdm import tqdm
+
+
+logger = logging.getLogger(__name__)
 
 
 class DownloadProgressBar:
@@ -53,16 +57,16 @@ def get_checkpoint_path(url: str, cache_dir: Optional[Path] = None) -> str:
     
     # Check if already downloaded
     if local_path.exists():
-        print(f"✓ Using cached checkpoint: {local_path}")
+        logger.info(f"Using cached checkpoint: {local_path}")
         return str(local_path)
     
     # Download
-    print(f"Downloading checkpoint from {url}")
-    print(f"Saving to: {local_path}")
+    logger.info(f"Downloading checkpoint from {url}")
+    logger.info(f"Saving to: {local_path}")
     
     try:
         urlretrieve(url, str(local_path), DownloadProgressBar())
-        print(f"✓ Download complete: {local_path}")
+        logger.info(f"Download complete: {local_path}")
         return str(local_path)
     except Exception as e:
         # Clean up partial download
@@ -77,9 +81,8 @@ def clear_cache():
         import shutil
         shutil.rmtree(CACHE_DIR)
         CACHE_DIR.mkdir(parents=True, exist_ok=True)
-        print(f"✓ Cleared cache: {CACHE_DIR}")
-
-
+    
+    logger.info(f"Cleared cache: {CACHE_DIR}")
 if __name__ == '__main__':
     # Test download
     test_url = 'https://download.openmmlab.com/mmpose/v1/projects/rtmpose/rtmdet_m_8xb32-100e_coco-obj365-person-235e8209.pth'

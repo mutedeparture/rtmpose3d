@@ -4,10 +4,14 @@ Simple interface: numpy array in -> 3D keypoints out
 """
 
 import sys
+import logging
 import warnings
 from pathlib import Path
 from typing import Optional, Dict
 import numpy as np
+
+# Setup logger
+logger = logging.getLogger(__name__)
 
 # Patch MMDetection version check BEFORE importing mmdet
 def _patch_mmdet_version_check():
@@ -109,7 +113,7 @@ class RTMPose3DInference:
         
         # Auto-download checkpoints if URLs provided
         if detector_checkpoint is None:
-            print("📥 Downloading detector checkpoint...")
+            logger.info("Downloading detector checkpoint...")
             detector_checkpoint = get_checkpoint_path(DETECTOR_CHECKPOINT_URL, cache_dir)
         elif detector_checkpoint.startswith('http'):
             detector_checkpoint = get_checkpoint_path(detector_checkpoint, cache_dir)
@@ -118,19 +122,19 @@ class RTMPose3DInference:
             # Auto-download pose checkpoint from GitHub releases
             pose_url = POSE_L_CHECKPOINT_URL if self.model_size == 'l' else None
             if pose_url:
-                print("📥 Downloading pose checkpoint...")
+                logger.info("Downloading pose checkpoint...")
                 pose_checkpoint = get_checkpoint_path(pose_url, cache_dir)
             else:
                 # Fallback: try local checkpoint from rtmpose3d_original if available
                 original_checkpoint = Path(__file__).parent.parent / 'rtmpose3d_original' / 'demo' / 'rtmw3d-l_cock14-0d4ad840_20240422.pth'
                 if original_checkpoint.exists():
-                    print(f"📦 Using local checkpoint: {original_checkpoint}")
+                    logger.info(f"Using local checkpoint: {original_checkpoint}")
                     pose_checkpoint = str(original_checkpoint)
                 else:
                     # Try cached version
                     cached_checkpoint = Path.home() / '.cache' / 'rtmpose3d' / 'checkpoints' / 'rtmw3d-l_cock14-0d4ad840_20240422.pth'
                     if cached_checkpoint.exists():
-                        print(f"✓ Using cached checkpoint: {cached_checkpoint}")
+                        logger.info(f"Using cached checkpoint: {cached_checkpoint}")
                         pose_checkpoint = str(cached_checkpoint)
                     else:
                         raise RuntimeError(
@@ -142,7 +146,7 @@ class RTMPose3DInference:
         elif pose_checkpoint.startswith('http'):
             pose_checkpoint = get_checkpoint_path(pose_checkpoint, cache_dir)
         
-        print("🔧 Initializing models...")
+        logger.info("Initializing models...")
         
         # Initialize detector
         self.detector = init_detector(
@@ -160,7 +164,7 @@ class RTMPose3DInference:
             device=device
         )
         
-        print("✅ Models loaded successfully!")
+        logger.info("Models loaded successfully!")
     
     def __call__(
         self,
@@ -228,9 +232,15 @@ class RTMPose3DInference:
             keypoints_3d = -kpts[..., [0, 2, 1]]
             keypoints_3d_list.append(keypoints_3d)
             
-            # For 2D, project 3D keypoints to XY plane
-            keypoints_2d = kpts[..., :2]
-            keypoints_2d_list.append(keypoints_2d)
+            # For 2D, use the transformed (projected) keypoints from MMPose
+            # These are the 2D pixel coordinates in the image space
+            transformed_kpts = pred.transformed_keypoints
+            if hasattr(transformed_kpts, 'cpu'):
+                transformed_kpts = transformed_kpts.cpu().numpy()
+            # Handle shape: squeeze extra dimensions [1, K, 2] -> [K, 2]
+            while transformed_kpts.ndim > 2 and transformed_kpts.shape[0] == 1:
+                transformed_kpts = np.squeeze(transformed_kpts, axis=0)
+            keypoints_2d_list.append(transformed_kpts)
             
             # Get scores
             scores = pred.keypoint_scores
