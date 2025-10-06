@@ -9,11 +9,6 @@ tests/*.jpg
 tests/*.png
 tests/*.jpeg
 
-# Exception: Keep documentation images
-!doc/*.jpg
-!doc/*.png
-!doc/*.jpeg
-
 # C extensions
 *.so
 

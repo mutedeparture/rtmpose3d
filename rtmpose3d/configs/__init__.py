@@ -17,8 +17,8 @@ POSE_X_CONFIG = str(CONFIG_DIR / 'rtmw3d-x_8xb32_cocktail14-384x288.py')
 HF_BASE = 'https://huggingface.co/rbarac/rtmpose3d/resolve/main'
 
 DETECTOR_CHECKPOINT_URL = f'{HF_BASE}/rtmdet_m_8xb32-100e_coco-obj365-person-235e8209.pth'
-POSE_L_CHECKPOINT_URL = f'{HF_BASE}/rtmw3d-l_cock14-0d4ad840_20240422.pth'
-POSE_X_CHECKPOINT_URL = None  # Add if X model checkpoint is available
+POSE_L_CHECKPOINT_URL = f'{HF_BASE}/rtmw3d-l_8xb64_cocktail14-384x288-794dbc78_20240626.pth'
+POSE_X_CHECKPOINT_URL = f'{HF_BASE}/rtmw3d-x_8xb64_cocktail14-384x288-b0a0eab7_20240626.pth'
 
 __all__ = [
     'CONFIG_DIR',
