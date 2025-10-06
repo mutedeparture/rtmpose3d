@@ -169,7 +169,8 @@ class RTMPose3DInference:
     def __call__(
         self,
         image: np.ndarray,
-        bbox_thr: float = 0.3
+        bbox_thr: float = 0.3,
+        single_person: bool = False
     ) -> Dict[str, np.ndarray]:
         """
         Run 3D pose estimation on a numpy array image
@@ -177,6 +178,7 @@ class RTMPose3DInference:
         Args:
             image: Numpy array (HWC, BGR format)
             bbox_thr: Bounding box confidence threshold
+            single_person: If True, only detect the most prominent person (largest bbox)
             
         Returns:
             Dictionary with numpy arrays:
@@ -192,11 +194,23 @@ class RTMPose3DInference:
         # Filter by bbox score and convert to numpy
         mask = pred_instances.scores > bbox_thr
         bboxes = pred_instances.bboxes[mask].cpu().numpy()
+        bbox_scores = pred_instances.scores[mask].cpu().numpy()
         labels = pred_instances.labels[mask].cpu().numpy()
         
         # Filter for person class (label 0 in COCO)
         person_mask = labels == 0
         bboxes = bboxes[person_mask]
+        bbox_scores = bbox_scores[person_mask]
+        
+        # If single_person mode, keep only the most prominent person
+        if single_person and len(bboxes) > 0:
+            # Calculate bbox areas (width * height)
+            areas = (bboxes[:, 2] - bboxes[:, 0]) * (bboxes[:, 3] - bboxes[:, 1])
+            # Use combination of area and confidence to find most prominent
+            prominence = areas * bbox_scores
+            most_prominent_idx = np.argmax(prominence)
+            bboxes = bboxes[most_prominent_idx:most_prominent_idx+1]
+            logger.info(f"Single person mode: selected person with bbox area {areas[most_prominent_idx]:.0f}px, confidence {bbox_scores[most_prominent_idx]:.3f}")
         
         if len(bboxes) == 0:
             warnings.warn(f"No person detected in image (found {len(pred_instances.bboxes)} total detections, {mask.sum()} above threshold {bbox_thr})")

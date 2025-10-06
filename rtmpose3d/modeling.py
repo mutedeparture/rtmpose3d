@@ -104,6 +104,7 @@ class RTMPose3D:
         self,
         image: np.ndarray,
         bbox_thr: Optional[float] = None,
+        single_person: bool = False,
         return_tensors: str = "np"
     ) -> Dict[str, Union[np.ndarray, torch.Tensor]]:
         """
@@ -112,6 +113,7 @@ class RTMPose3D:
         Args:
             image: Input image as numpy array (H, W, 3) in BGR format
             bbox_thr: Bounding box confidence threshold (uses config.bbox_thr if None)
+            single_person: If True, only detect the most prominent person (largest bbox)
             return_tensors: Format of returned tensors
                 - "np": Return numpy arrays (default)
                 - "pt": Return PyTorch tensors
@@ -124,7 +126,8 @@ class RTMPose3D:
                 - bboxes: Detection bounding boxes (N, 4)
                 
         Example:
-            >>> outputs = model(image)  # numpy arrays
+            >>> outputs = model(image)  # numpy arrays, all persons
+            >>> outputs = model(image, single_person=True)  # only most prominent person
             >>> outputs = model(image, return_tensors="pt")  # torch tensors
         """
         # Use config bbox_thr if not specified
@@ -132,7 +135,7 @@ class RTMPose3D:
             bbox_thr = self.config.bbox_thr
         
         # Run inference using underlying model
-        results = self._model(image, bbox_thr=bbox_thr)
+        results = self._model(image, bbox_thr=bbox_thr, single_person=single_person)
         
         # Convert to requested tensor format
         if return_tensors == "pt":
