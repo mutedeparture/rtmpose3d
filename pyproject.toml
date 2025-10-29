@@ -1,0 +1,62 @@
+[build-system]
+requires = ["uv_build>=0.9.5,<0.10.0"]
+build-backend = "uv_build"
+
+[project]
+name = "rtmpose3d"
+version = "1.0.0"
+description = "RTMPose3D: Real-Time Multi-Person 3D Pose Estimation - Simple PyTorch interface"
+readme = "README.md"
+dependencies = [
+    "torch==2.4.*",
+    "numpy>=1.20.0,<2.0.0",
+    "opencv-python>=4.5.0",
+    "mmpose>=1.0.0",
+    "mmdet>=3.0.0",
+    "mmcv>=2.0.0",
+    "mmengine>=0.7.0",
+    "tqdm>=4.60.0",
+]
+keywords = ["pose estimation", "3d pose", "computer vision", "pytorch"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+requires-python = "==3.11.*"
+
+[tool.uv.build-backend]
+module-name = "rtmpose3d"
+module-root = ""
+
+[tool.uv.extra-build-dependencies]
+chumpy = ["pip"] # Pending: https://github.com/mattloper/chumpy/pull/62
+
+[tool.uv.sources]
+torch = [
+    { index = "pytorch-cu121", marker = "sys_platform == 'linux' or sys_platform == 'win32'" },
+]
+torchvision = [
+    { index = "pytorch-cu121", marker = "sys_platform == 'linux' or sys_platform == 'win32'" },
+]
+mmcv = { url = "https://download.openmmlab.com/mmcv/dist/cu121/torch2.4.0/mmcv-2.2.0-cp311-cp311-manylinux1_x86_64.whl" }
+
+[[tool.uv.index]]
+name = "pytorch-cu121"
+url = "https://download.pytorch.org/whl/cu121"
+explicit = true
+
+[[project.authors]]
+name = "Bahadir Arac"
+
+[project.license]
+text = "Apache-2.0"
+
+[project.urls]
+Homepage = "https://github.com/mutedeparture/rtmpose3d"
