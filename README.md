@@ -192,7 +192,8 @@ clear_cache()  # Removes all cached checkpoints
 ## Examples
 
 ```bash
-python examples/basic_usage.py [image_path]
+uv run examples/basic_usage.py [image_path]
+uv run tests/test_visualize.py [image_path] [output_name]
 ```
 
 ## Citation
