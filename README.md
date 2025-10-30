@@ -21,7 +21,7 @@ Standalone PyTorch package for real-time whole-body 3D pose estimation. Provides
 
 ## Requirements
 
-- Python >= 3.8, PyTorch >= 2.0.0
+- Python 3.11, PyTorch 2.4.0, CUDA 12.1 drivers
 - CUDA-capable GPU (recommended, 4GB+ VRAM)
 
 ## Installation
@@ -29,21 +29,12 @@ Standalone PyTorch package for real-time whole-body 3D pose estimation. Provides
 ```bash
 # Clone repository
 git clone https://github.com/mutedeparture/rtmpose3d.git
-cd rtmpose3d
 
-# Install PyTorch (adjust CUDA version as needed)
-pip install torch>=2.0.0 torchvision --index-url https://download.pytorch.org/whl/cu121
-
-# Install mmcv pre-built wheel (required - avoids long compilation)
-pip install mmcv==2.2.0 -f https://download.openmmlab.com/mmcv/dist/cu121/torch2.4/index.html
-
-# Install package
-pip install -r requirements.txt
-pip install -e .
+# Will ensure that the dependencies are installed correctly
+uv run main.py
 ```
 
 Model checkpoints (~330MB) auto-download from [HuggingFace Hub](https://huggingface.co/rbarac/rtmpose3d) on first use and cache to `~/.cache/rtmpose3d/checkpoints/`.
-
 
 ## Quick Start
 
@@ -85,7 +76,6 @@ Detect only the most prominent person (largest bbox × highest confidence):
 results = model(image, single_person=True)  # Returns N=1
 ```
 
-
 ## Output Format
 
 ```python
@@ -102,27 +92,27 @@ results = model(image, single_person=True)  # Returns N=1
 ### Coordinate Systems
 
 **2D Keypoints**: Pixel coordinates
+
 - X: horizontal [0, image_width]
 - Y: vertical [0, image_height]
 
 **3D Keypoints**: Camera-relative in meters (Z-up convention)
+
 - X: horizontal (negative=left, positive=right)
 - Y: depth (negative=closer, positive=farther)
 - Z: vertical (negative=down, positive=up)
-
 
 ## Keypoint Format
 
 133 keypoints in COCO-WholeBody format:
 
-| Index | Body Part | Count | Description |
-|-------|-----------|-------|-------------|
-| 0-16 | Body | 17 | Nose, eyes, ears, shoulders, elbows, wrists, hips, knees, ankles |
-| 17-22 | Feet | 6 | Foot keypoints |
-| 23-90 | Face | 68 | Facial landmarks |
-| 91-111 | Left Hand | 21 | Left hand keypoints |
-| 112-132 | Right Hand | 21 | Right hand keypoints |
-
+| Index   | Body Part  | Count | Description                                                      |
+| ------- | ---------- | ----- | ---------------------------------------------------------------- |
+| 0-16    | Body       | 17    | Nose, eyes, ears, shoulders, elbows, wrists, hips, knees, ankles |
+| 17-22   | Feet       | 6     | Foot keypoints                                                   |
+| 23-90   | Face       | 68    | Facial landmarks                                                 |
+| 91-111  | Left Hand  | 21    | Left hand keypoints                                              |
+| 112-132 | Right Hand | 21    | Right hand keypoints                                             |
 
 ## Advanced Usage
 
@@ -172,25 +162,26 @@ from rtmpose3d import clear_cache
 clear_cache()  # Removes all cached checkpoints
 ```
 
-
 ## Model Information
 
 **RTMW3D-L (Large)** - Default
+
 - 65M parameters
 - Input: RGB image (auto-resized to 384×288)
 - Output: 133 3D keypoints per person
 - Speed: Real-time on modern GPUs
 
 **RTMW3D-X (Extra Large)**
+
 - 98M parameters
 - Higher accuracy, slower inference
 
 **Checkpoints** (~330MB total):
+
 - Person Detector (RTMDet-M): ~99MB
 - Pose Estimator (RTMW3D-L): ~231MB
 - Source: [rbarac/rtmpose3d](https://huggingface.co/rbarac/rtmpose3d) on HuggingFace Hub
 - Cache: `~/.cache/rtmpose3d/checkpoints/`
-
 
 ## Technical Notes
 
@@ -201,7 +192,8 @@ clear_cache()  # Removes all cached checkpoints
 ## Examples
 
 ```bash
-python examples/basic_usage.py [image_path]
+uv run examples/basic_usage.py [image_path]
+uv run tests/test_visualize.py [image_path] [output_name]
 ```
 
 ## Citation
@@ -223,5 +215,3 @@ Apache 2.0
 ## Acknowledgments
 
 Built on [MMPose](https://github.com/open-mmlab/mmpose) by OpenMMLab.
-
-````
